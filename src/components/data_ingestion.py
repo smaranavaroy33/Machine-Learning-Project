@@ -7,6 +7,9 @@ from src.logger import logging
 from sklearn.model_selection import train_test_split
 from dataclasses import dataclass
 
+from src.components.data_transformation import DataTransformationConfig
+from src.components.data_transformation import DataTransformation
+
 @dataclass
 class DataIngestionConfig:
     train_data_path: str = os.path.join('artifacts','train.csv')
@@ -19,6 +22,20 @@ class DataIngestion:
         self.ingestion_config = DataIngestionConfig()
     
     def initiate_data_ingestion(self):
+        """
+        Executes the data ingestion process which includes reading the dataset, saving the raw data,
+        performing a train-test split, and saving the resulting datasets to specified file paths.
+        Steps:
+            1. Reads the dataset from a CSV file.
+            2. Saves the raw dataset to the configured raw data path.
+            3. Splits the dataset into training and testing sets.
+            4. Saves the training and testing sets to their respective file paths.
+            5. Logs each step of the process for traceability.
+        Returns:
+            tuple: Paths to the training and testing data files.
+        Raises:
+            CustomException: If any error occurs during the ingestion process.
+        """
         logging.info("Data Ingestion Started")
 
         try:
@@ -47,4 +64,7 @@ class DataIngestion:
 
 if __name__ == "__main__":
     obj = DataIngestion()
-    obj.initiate_data_ingestion()
+    train_data, test_data = obj.initiate_data_ingestion()
+
+    data_transformation = DataTransformation()
+    data_transformation.initiate_data_transformation(train_data, test_data)
