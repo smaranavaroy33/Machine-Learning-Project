@@ -13,6 +13,9 @@ from src.exception import CustomException
 from src.logger import logging 
 from src.utils import save_object
 
+from src.components.model_trainer import ModelTrainerConfig
+from src.components.model_trainer import ModelTrainer
+
 @dataclass
 class DataTransformationConfig:
     preprocessor_obj_file_path = os.path.join('artifacts','preprocessor.pkl')
@@ -44,7 +47,7 @@ class DataTransformation:
                 steps = [
                     ("imputer", SimpleImputer(strategy="most_frequent")),
                     ("onehotencoder", OneHotEncoder()),
-                    ("scaler", StandardScaler())
+                    ("scaler", StandardScaler(with_mean= False))
                 ]
             )
 
@@ -85,12 +88,12 @@ class DataTransformation:
             logging.info("Applying preprocessing object on training and testing dataframes")
 
             input_feature_train_arr = preprocessing_obj.fit_transform(input_feature_train_df)
-            input_feature_test_arr = preprocessing_obj.transform(input_feature_train_df)
+            input_feature_test_arr = preprocessing_obj.transform(input_feature_test_df)
 
             logging.info("Applied preprocessing object on training and testing dataframes")
 
-            train_arr = np.c[input_feature_train_arr, np.array(target_feature_train_df)]
-            test_arr = np.c[input_feature_test_arr, np.array(target_feature_test_df)]
+            train_arr = np.c_[input_feature_train_arr, np.array(target_feature_train_df)]
+            test_arr = np.c_[input_feature_test_arr, np.array(target_feature_test_df)]
 
             logging.info("Saved preprocessing object")
 
